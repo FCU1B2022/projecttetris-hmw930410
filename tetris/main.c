@@ -10,7 +10,7 @@
 #define DOWN_KEY 0x28     // The key to move down, default = 0x28 (down arrow)
 #define FALL_KEY 0x20     // The key to fall, default = 0x20 (spacebar)
 
-#define FALL_DELAY 500    // The delay between each fall, default = 500
+#define FALL_DELAY 200    // The delay between each fall, default = 500
 #define RENDER_DELAY 100  // The delay between each frame, default = 100
 
 #define LEFT_FUNC() GetAsyncKeyState(LEFT_KEY) & 0x8000
@@ -406,7 +406,7 @@ void logic(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], State* state)
     }
     else if (FALL_FUNC()) {
         state->fallTime += FALL_DELAY * CANVAS_HEIGHT;
-        Sleep(0.12);
+        Sleep(0.3);
     }
 
     state->fallTime += RENDER_DELAY;
@@ -419,7 +419,7 @@ void logic(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], State* state)
             state->y++;
         }
         else {
-            state->score += clearLine(canvas);
+            state->score += clearLine(canvas) * 100;
 
             state->x = CANVAS_WIDTH / 2;
             state->y = 0;
@@ -432,8 +432,9 @@ void logic(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], State* state)
 
             if (!move(canvas, state->x, state->y, state->rotate, state->x, state->y, state->rotate, state->queue[0])) {
                 system("cls");
-                printf("\033[%d;%dH \033[31m GAME OVER \033[31m\033[%d;%dH\x1b[0m", CANVAS_HEIGHT - 9, CANVAS_WIDTH * 2 + 1 , CANVAS_HEIGHT + 5, 0);
-                printf("\033[%d;%dH \\ SCORE : %d / \033[%d;%dH", CANVAS_HEIGHT - 7, CANVAS_WIDTH * 2, state->score, CANVAS_HEIGHT + 5, 0);
+                //HighestScore(&state);
+                printf("\033[%d;%dH \033[31m GAME OVER \033[31m\033[%d;%dH\x1b[0m", CANVAS_HEIGHT - 9, CANVAS_WIDTH * 2 + 8 , CANVAS_HEIGHT + 5, 0);
+                printf("\033[%d;%dH \\ YOUR SCORE : %d / \033[%d;%dH", CANVAS_HEIGHT - 7, CANVAS_WIDTH * 2 + 4, state->score, CANVAS_HEIGHT + 5, 0);
                 exit(0);
             }
         }
@@ -449,12 +450,45 @@ bool CourseHide()
     info.bVisible = FALSE;
     SetConsoleCursorInfo(consoleHandle, &info);
     return 0;
-}//
+}
+
+void StartSceen()
+{
+    printf("\033[%d;%dH \x1b[;33;1m TTTTTTTTTT EEEEEEEE TTTTTTTTTT RRRRRRRRR IIIIIIIIII SSSSSSSS \n", CANVAS_HEIGHT - 13, CANVAS_WIDTH - 2);
+    printf("\033[%d;%dH \x1b[;33;1m     TT     EE           TT     RR     RR     II     SS       \n", CANVAS_HEIGHT - 12, CANVAS_WIDTH - 2);
+    printf("\033[%d;%dH \x1b[;33;1m     TT     EEEEEEE      TT     RRRRRRRRR     II     SSSSSSSS \n", CANVAS_HEIGHT - 11, CANVAS_WIDTH - 2);
+    printf("\033[%d;%dH \x1b[;33;1m     TT     EE           TT     RR    RR      II           SS \n", CANVAS_HEIGHT - 10, CANVAS_WIDTH - 2);
+    printf("\033[%d;%dH \x1b[;33;1m     TT     EEEEEEEE     TT     RR     RR IIIIIIIIII SSSSSSSS \n", CANVAS_HEIGHT - 9, CANVAS_WIDTH - 2);
+    printf("\033[%d;%dH \x1b[;33;1m !  START  !\n", CANVAS_HEIGHT - 6, CANVAS_WIDTH * 2 + 12);
+
+    Sleep(950);
+}
+
+int HighestScore(State* state)
+{
+    int HIGHEST_SCORE;
+    errno_t err;
+    FILE* fin_highestScore;
+    if ((err = fopen_s(&fin_highestScore, "HighestScore.txt", "r+")) != 0) {
+        if (fin_highestScore < state->score) {
+            fprintf(fin_highestScore, "%d", state->score);
+            HIGHEST_SCORE = state->score;
+            printf("\033[%d;%dH ¡i HISTORICAL HIGHEST SCORE : %d ¡j \033[%d;%dH", CANVAS_HEIGHT - 5, CANVAS_WIDTH * 2 + 22, HIGHEST_SCORE, CANVAS_HEIGHT + 5, 0);
+        }
+        else {
+            HIGHEST_SCORE = fin_highestScore;
+            printf("\033[%d;%dH ¡i HISTORICAL HIGHEST SCORE : %d ¡j \033[%d;%dH", CANVAS_HEIGHT - 5, CANVAS_WIDTH * 2 + 22, HIGHEST_SCORE, CANVAS_HEIGHT + 5, 0);
+        }
+    }
+    else
+        printf("error\n");
+    fclose(fin_highestScore);
+}
 
 int main()
 {
-    CourseHide();//
-
+    CourseHide();
+    StartSceen();
     srand(time(NULL));
     State state = {
         .x = CANVAS_WIDTH / 2,
