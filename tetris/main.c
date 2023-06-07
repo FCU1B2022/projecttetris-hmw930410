@@ -432,7 +432,6 @@ void logic(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], State* state)
 
             if (!move(canvas, state->x, state->y, state->rotate, state->x, state->y, state->rotate, state->queue[0])) {
                 system("cls");
-                //HighestScore(&state);
                 printf("\033[%d;%dH \033[31m GAME OVER \033[31m\033[%d;%dH\x1b[0m", CANVAS_HEIGHT - 9, CANVAS_WIDTH * 2 + 8 , CANVAS_HEIGHT + 5, 0);
                 printf("\033[%d;%dH \\ YOUR SCORE : %d / \033[%d;%dH", CANVAS_HEIGHT - 7, CANVAS_WIDTH * 2 + 4, state->score, CANVAS_HEIGHT + 5, 0);
                 exit(0);
@@ -462,27 +461,6 @@ void StartSceen()
     printf("\033[%d;%dH \x1b[;33;1m !  START  !\n", CANVAS_HEIGHT - 6, CANVAS_WIDTH * 2 + 12);
 
     Sleep(950);
-}
-
-int HighestScore(State* state)
-{
-    int HIGHEST_SCORE;
-    errno_t err;
-    FILE* fin_highestScore;
-    if ((err = fopen_s(&fin_highestScore, "HighestScore.txt", "r+")) != 0) {
-        if (fin_highestScore < state->score) {
-            fprintf(fin_highestScore, "%d", state->score);
-            HIGHEST_SCORE = state->score;
-            printf("\033[%d;%dH ¡i HISTORICAL HIGHEST SCORE : %d ¡j \033[%d;%dH", CANVAS_HEIGHT - 5, CANVAS_WIDTH * 2 + 22, HIGHEST_SCORE, CANVAS_HEIGHT + 5, 0);
-        }
-        else {
-            HIGHEST_SCORE = fin_highestScore;
-            printf("\033[%d;%dH ¡i HISTORICAL HIGHEST SCORE : %d ¡j \033[%d;%dH", CANVAS_HEIGHT - 5, CANVAS_WIDTH * 2 + 22, HIGHEST_SCORE, CANVAS_HEIGHT + 5, 0);
-        }
-    }
-    else
-        printf("error\n");
-    fclose(fin_highestScore);
 }
 
 int main()
